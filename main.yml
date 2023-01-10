@@ -13,8 +13,10 @@ jobs:
         with:
           python-version: 3.9
       - name: test GetFunction
-        run: cd cloudRC/GetFunction && python -m pytest && cd ../../
+        run: cd cloud-r-c/cloudRC/GetFunction && python -m pytest && cd ../../
       - name: test PutFunction
-        run: cd cloudRC/PutFunction && python -m pytest && cd ../../
+        run: cd cloud-r-c/cloudRC/PutFunction && python -m pytest && cd ../../
 
 #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
+
+#token2 : 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
