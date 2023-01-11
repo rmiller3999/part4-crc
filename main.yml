@@ -12,11 +12,16 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - name: Install pytest
+        run: python -m pip install pytest
       - name: test GetFunction
         run: cd cloud-r-c/cloudRC/GetFunction && python -m pytest && cd ../../
       - name: test PutFunction
         run: cd cloud-r-c/cloudRC/PutFunction && python -m pytest && cd ../../
 
+
 #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
 
 #token2 : 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
+
+#3 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
