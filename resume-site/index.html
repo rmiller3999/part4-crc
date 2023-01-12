@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script>
+      // Send a request to the first AWS endpoint
+      fetch('https://ioqj7jpn7mgosxew5sxzengf5y0yidab.lambda-url.us-east-1.on.aws/')
+        // If the first request is successful, send a request to the second AWS endpoint
+        .then(()=> fetch('https://3p43y5gfwamddng3zlwlhemggu0cjswd.lambda-url.us-east-1.on.aws/'))
+        // Parse the response body as a JSON object
+        .then(response => response.json())
+        // Update the innerText of the <span> element with the id attribute "replaceme"
+        // to the count field of the data object
+        .then((data) => {
+            document.getElementById('replaceme').innerText = data.count
+        })
+    </script>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/xicon" />
+    <style media="screen">
+
+      p{
+
+      // Style all <p> elements with red text
+        color: red;
+      }
+    </style>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+
+  <body>
+    <p>
+      Hello world!!
+
+      Visitors:
+      <span id="replaceme" />
+    </p>
+
+  </body>
+</html>
