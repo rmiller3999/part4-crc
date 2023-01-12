@@ -1,0 +1,180 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  cloudRC
+
+  Sample SAM Template for cloudRC
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+
+  MyWebsite:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      BucketName: this-isnt-gonna-wrk650269
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: cloud-resume-challenge
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "ID"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "ID"
+          KeyType: "HASH"
+
+  MyCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: website.bob-learns-cloud.com # TODO: Don't hardcode me
+      ValidationMethod: DNS
+
+
+  MyRoute53Record:
+    Type: "AWS::Route53::RecordSetGroup"
+    Properties:
+      HostedZoneId: Z02782643A9C5UNQSH7IJ # TODO: Don't hardcode me
+      RecordSets:
+        - Name: website.bob-learns-cloud.com # TODO: Don't hardcode me
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2 #cloudfront ID
+            DNSName: !GetAtt MyDistribution.DomainName
+
+  MyDistribution:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        ViewerCertificate:
+            AcmCertificateArn: !Ref MyCertificate
+            SslSupportMethod: sni-only
+        Aliases:
+          - website.bob-learns-cloud.com
+
+        DefaultCacheBehavior:
+          ViewerProtocolPolicy: allow-all
+          TargetOriginId: this-isnt-gonna-wrk650269.s3-website-us-east-1.amazonaws.com
+          DefaultTTL: 0
+          MinTTL: 0
+          MaxTTL: 0
+          ForwardedValues:
+            QueryString: false
+        Origins:
+          - DomainName: this-isnt-gonna-wrk650269.s3-website-us-east-1.amazonaws.com
+            Id: this-isnt-gonna-wrk650269.s3-website-us-east-1.amazonaws.com
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only #match-viewer
+        Enabled: "true"
+        DefaultRootObject: index.html
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref MyWebsite
+                - /*
+      Bucket: !Ref MyWebsite
+
+#was HelloWorldFunction
+
+  GetFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: cloud-resume-challenge
+      CodeUri: GetFunction/ #same here
+      Handler: app.lambda_handler #GetFunction #app.lambda_handler this seemed to work ! app.!
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        CatchAll: #HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /get #path was hello
+            Method: get
+
+# douplicate but with a put
+  PutFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: cloud-resume-challenge
+      CodeUri: PutFunction/
+      Handler: app.lambda_handler #PutFunction #app.lambda_handler #edited this handler might not work
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        CatchAll: #HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /put
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  #changing ...maybe gets and puts unclear but hello in value section might need to change ?
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Get function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/get/"
+  GetFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt GetFunction.Arn
+  GetFunctionIamRole:
+    Description: "Implicit IAM Role created for Get function"
+    Value: !GetAtt GetFunctionRole.Arn
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  #changing ...maybe gets and puts unclear but hello in value section might need to change ?
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Put function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/put/"
+  PutFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt PutFunction.Arn
+  PutFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt PutFunctionRole.Arn
+
+#Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  #changing ...maybe gets and puts unclear but hello in value section might need to change ?
+  #HelloWorldApi:
+    #Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    #Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  #HelloWorldFunction:
+    #Description: "Hello World Lambda Function ARN"
+    #Value: !GetAtt HelloWorldFunction.Arn
+  #HelloWorldFunctionIamRole:
+    #Description: "Implicit IAM Role created for Hello World function"
+    #Value: !GetAtt HelloWorldFunctionRole.Arn
