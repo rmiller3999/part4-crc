@@ -20,4 +20,8 @@ jobs:
         run: cd cloud-r-c/cloudRC/PutFunction && python -m pytest && cd ../../
 
 
-#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
+#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
+
+#token2 : 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
+
+#3 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
