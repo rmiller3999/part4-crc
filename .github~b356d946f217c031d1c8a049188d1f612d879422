@@ -1,0 +1,21 @@
+
+name: main
+on: push
+env:
+  python_version: 3.9
+
+jobs:
+  test-infra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: test GetFunction
+        run: cd cloud-r-c/cloudRC/GetFunction && python -m pytest && cd ../../
+      - name: test PutFunction
+        run: cd cloud-r-c/cloudRC/PutFunction && python -m pytest && cd ../../

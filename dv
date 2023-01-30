@@ -1,0 +1,25 @@
+[33mcommit e7a6debcdbd14bcd1ca5b5ea389d699a3e7a0c7e[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Robb <rmiller400@gmail.com>
+Date:   Mon Jan 23 17:08:44 2023 -0500
+
+    added /
+
+[1mdiff --git a/.github/workflows/main2.yml b/.github/workflows/main2.yml[m
+[1mindex 1b2f977..15c1002 100644[m
+[1m--- a/.github/workflows/main2.yml[m
+[1m+++ b/.github/workflows/main2.yml[m
+[36m@@ -15,10 +15,11 @@[m [mjobs:[m
+       - name: Install pytest[m
+         run: python -m pip install pytest[m
+       - name: test GetFunction[m
+[31m-        run: cd cloudRC/GetFunction && python -m pytest && cd ../../[m
+[32m+[m[32m        run: cd /cloudRC/GetFunction && python -m pytest && cd ../../[m
+       - name: test PutFunction[m
+[31m-        run: cd cloudRC/PutFunction && python -m pytest && cd ../../[m
+[31m-            #cd cloud-r-c/cloudRC/PutFunction && python -m pytest && cd ../../ possible dont need cloud-r-c/ for both[m
+[32m+[m[32m        run: cd /cloudRC/PutFunction && python -m pytest && cd ../../[m
+[32m+[m[32m            #cd cloud-r-c/cloudRC/PutFunction && python -m pytest && cd ../../ possible dont need cloud-r-c/ for both.[m
+[32m+[m[32m# think we are missing a / at the beggining because its not finding the directories[m
+ [m
+ [m
+ # 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  1/18/23[m
