@@ -18,7 +18,5 @@ jobs:
       - name: Install pytest
         run: python -m pip install pytest
       - name: test GetFunction
-        run: cd GetFunction/ && python -m pytest && cd ../
-      - name: test PutFunction
-        run: cd PutFunction/ && python -m pytest && cd ../
-            #
+
+        run: cd tests && python -m pytest && cd ../
